@@ -20,10 +20,11 @@ setup(
     url='https://github.com/painor/telethon-secret-chat',
     download_url='https://github.com/painor/telethon-secret-chat/releases',
     keywords=['Telegram', 'Telethon', 'SecretChats', 'Plugin'],
-    python_requires='>=3.5',
     install_requires=[
         'telethon',
     ],
+
+    python_requires='>=3.5',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
