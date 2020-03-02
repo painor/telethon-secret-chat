@@ -16,8 +16,8 @@ based on daniil's implementation at its core.
 -  ☑ Recieving text messages
 -  ☑ Uploading/downloading media
 -  ☑ Dealing with rekeying¹
--  ☐ Saving secret chats keys to database²
--  ☐ Saving messages to database³
+-  [ ] Saving secret chats keys to database²
+-  [ ] Saving messages to database³
 -  ☑ Automatic decryption/accepting/finishing
 
 ¹ Every 100 messages you need to recreate the auth key.
