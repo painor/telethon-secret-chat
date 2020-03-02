@@ -3,7 +3,7 @@ from enum import Enum
 from telethon import TelegramClient
 from telethon.tl import types
 
-from SecretMethods import SecretChatMethods
+from secret_methods import SecretChatMethods
 
 
 class SECRET_TYPES(Enum):

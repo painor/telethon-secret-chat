@@ -16,7 +16,7 @@ from telethon.tl.types import InputEncryptedChat, TypeEncryptedChat, EncryptedFi
     InputFileBig, InputFile, InputEncryptedFileBigUploaded, InputEncryptedFileUploaded
 from telethon.tl.types.messages import DhConfigNotModified
 
-from SecretSechma.SecretTL import DecryptedMessageService, DecryptedMessageActionRequestKey, \
+from .secret_sechma.secretTL import DecryptedMessageService, DecryptedMessageActionRequestKey, \
     DecryptedMessageActionAcceptKey, DecryptedMessageActionAbortKey, DecryptedMessageActionCommitKey, \
     DecryptedMessageActionNoop, DecryptedMessageService8, DecryptedMessageActionNotifyLayer, \
     DecryptedMessageActionSetMessageTTL, DecryptedMessageActionResend, DecryptedMessage8, DecryptedMessage23, \
