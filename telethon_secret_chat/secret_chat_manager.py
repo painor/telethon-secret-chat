@@ -3,7 +3,7 @@ from enum import Enum
 from telethon import TelegramClient
 from telethon.tl import types
 
-from secret_methods import SecretChatMethods
+from .secret_methods import SecretChatMethods
 
 
 class SECRET_TYPES(Enum):
@@ -61,4 +61,3 @@ class SecretChatManager(SecretChatMethods):
                         decrypted_event = await self.handle_encrypted_update(event)
                         self.patch_event(decrypted_event)
                     self.client.loop.create_task(callback(decrypted_event))
-
