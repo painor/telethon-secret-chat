@@ -33,8 +33,17 @@ Examples :
 
 ::
 
+   client = TelegramClient(...)
 
-   soon
+   async def replier(event):
+    # all events are encrypted by default
+    if event.decrypted_event.message and event.decrypted_event.message == "hello":
+        await event.reply("hi")
+
+
+    manager = SecretChatManager(client, auto_accept=True)  # automatically accept new secret chats
+    manager.add_secret_event_handler(func=replier) # we can specify the type of the event
+    client.run_until_disconnected()
 
 .. _`https://core.telegram.org/api/end-to-end`: https://core.telegram.org/api/end-to-end
 .. _`https://github.com/danog/MadelineProto`: https://github.com/danog/MadelineProto
