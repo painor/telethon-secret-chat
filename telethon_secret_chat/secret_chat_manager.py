@@ -1,9 +1,12 @@
+import sqlite3
 from enum import Enum
 
 from telethon import TelegramClient
 from telethon.tl import types
 from telethon.tl.alltlobjects import tlobjects
 
+from .storage.sqlite import SecretSQLiteSession
+from .storage.memory import SecretMemorySession
 from .secret_sechma import secret_tlobjects
 from .secret_methods import SecretChatMethods
 
@@ -19,11 +22,16 @@ def patch_tlobjects():
 
 class SecretChatManager(SecretChatMethods):
 
-    def __init__(self, client: TelegramClient, auto_accept=False):
+    def __init__(self, client: TelegramClient, session=None, auto_accept=False):
         self.secret_events = []
         self.dh_config = None
         self.auto_accept = auto_accept
         self.client = client
+        if not session:
+            self.session = SecretMemorySession()
+
+        elif isinstance(session, sqlite3.Connection):
+            self.session = SecretSQLiteSession(session)
         self.client.add_event_handler(self._secret_chat_event_loop)
 
     def add_secret_event_handler(self, event_type=SECRET_TYPES.decrypt, func=None):
@@ -46,7 +54,7 @@ class SecretChatManager(SecretChatMethods):
 
     async def _secret_chat_event_loop(self, event):
         if 0x1be31789 not in tlobjects:  # check for decryptedMessage constructor
-            patch_tlobjects()   # patch the tlobjects so we can read it with bytes
+            patch_tlobjects()  # patch the tlobjects so we can read it with bytes
 
         if isinstance(event, types.UpdateEncryption):
             if isinstance(event.chat, types.EncryptedChat):

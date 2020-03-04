@@ -17,7 +17,7 @@ except ImportError as e:
 TABLE_NAME = "plugin_secret_chats"
 
 
-class SQLiteSession(SecretMemorySession):
+class SecretSQLiteSession(SecretMemorySession):
     """This session contains the required information to login into your
        Telegram account. NEVER give the saved session file to anyone, since
        they would gain instant access to all your messages and contacts.
@@ -57,6 +57,7 @@ class SQLiteSession(SecretMemorySession):
                   updated integer,
                   created integer,
                   mtproto integer,
+                  temp integer,
                 )"""
             )
 
@@ -93,9 +94,23 @@ class SQLiteSession(SecretMemorySession):
             self._conn.close()
             self._conn = None
 
+    def save_chat(self, chat: SecretChat, temp=False):
+        c = self._conn.cursor()
+
+        row = (
+            chat.id, chat.access_hash, chat.auth_key, 1 if chat.admin else 0, chat.user_id, chat.in_seq_no_x,
+            chat.out_seq_no_x, chat.in_seq_no, chat.out_seq_no, chat.layer, chat.ttl, chat.ttr, chat.updated,
+            chat.created, chat.mtproto, temp)
+
+        try:
+            c.executemany(
+                f'insert or replace into {TABLE_NAME} values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', row)
+        finally:
+            c.close()
+
     def get_temp_secret_chat_by_id(self, id):
         row = self._execute(
-            f"select * from {TABLE_NAME} where type='temp' and id = ?", id)
+            f"select * from {TABLE_NAME} where temp=1 and id = ?", id)
         if row:
             input_chat = InputEncryptedChat(chat_id=row[0], access_hash=row[1])
             return SecretChat(id=row[0], access_hash=row[1], auth_key=row[2], admin=True if row[3] else False,
@@ -105,7 +120,7 @@ class SQLiteSession(SecretMemorySession):
 
     def get_secret_chat_by_id(self, id):
         row = self._execute(
-            f"select * from {TABLE_NAME} where type='normal' and id = ?", id)
+            f"select * from {TABLE_NAME} where temp=0 and id = ?", id)
 
         if row:
             input_chat = InputEncryptedChat(chat_id=row[0], access_hash=row[1])
