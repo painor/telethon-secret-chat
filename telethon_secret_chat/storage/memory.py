@@ -2,6 +2,7 @@ from .abstract import SecretSession
 
 
 class SecretMemorySession(SecretSession):
+
     @property
     def temp_secret_chat(self):
         return self._temp_secret_chat
@@ -18,14 +19,6 @@ class SecretMemorySession(SecretSession):
     def secret_chats(self, value):
         self._secret_chats = value
 
-    @property
-    def temp_rekeyed_secret_chats(self):
-        return self._temp_rekeyed_secret_chats
-
-    @temp_rekeyed_secret_chats.setter
-    def temp_rekeyed_secret_chats(self, value):
-        self._temp_rekeyed_secret_chats = value
-
     def __init__(self):
         super().__init__()
         self._temp_secret_chat = {}
@@ -40,3 +33,10 @@ class SecretMemorySession(SecretSession):
 
     def delete(self):
         pass
+
+    def get_temp_secret_chat_by_id(self, id):
+        return self._temp_rekeyed_secret_chats.get(id)
+
+    def get_secret_chat_by_id(self, id):
+        return self._secret_chats.get(id)
+

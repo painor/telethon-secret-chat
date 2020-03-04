@@ -1,6 +1,9 @@
 import datetime
 import os
 
+from telethon.tl.types import InputEncryptedChat
+
+from telethon_secret_chat.secret_methods import SecretChat
 from .memory import SecretMemorySession
 
 try:
@@ -10,6 +13,8 @@ try:
 except ImportError as e:
     sqlite3 = None
     sqlite3_err = type(e)
+
+TABLE_NAME = "plugin_secret_chats"
 
 
 class SQLiteSession(SecretMemorySession):
@@ -27,24 +32,31 @@ class SQLiteSession(SecretMemorySession):
         if not isinstance(sqlite_connection, sqlite3.Connection):
             raise ConnectionError("Please pass an sqlite3 connection")
         super().__init__()
-        self.filename = ':memory:'
-        self.save_entities = True
 
-        self._conn = None
-        c = self._cursor()
+        self._conn = sqlite_connection
+        c = self._conn.cursor()
         c.execute("select name from sqlite_master "
-                  "where type='table' and name='secret_chats'")
-        if c.fetchone():
-            # Tables already exist, check for the version
-            c.execute("select * from secret_chats")
-            secret_chats = c.fetchall()
-            c.close()
-        else:
+                  f"where type='table' and name={TABLE_NAME}")
+        if not c.fetchone():
             # Tables don't exist, create new ones
             self._create_table(
                 c,
-                """plugin_secret_chats (
-                  
+                f"""{TABLE_NAME} (
+                  id integer primary key,
+                  access_hash integer,
+                  auth_key blob,
+                  admin integer,
+                  user_id integer,
+                  in_seq_no_x integer,
+                  out_seq_no_x integer,
+                  in_seq_no integer,
+                  out_seq_no integer,
+                  layer integer,
+                  ttl integer,
+                  ttr integer,
+                  updated integer,
+                  created integer,
+                  mtproto integer,
                 )"""
             )
 
@@ -63,19 +75,12 @@ class SQLiteSession(SecretMemorySession):
         if self._conn is not None:
             self._conn.commit()
 
-    def _cursor(self):
-        """Asserts that the connection is open and returns a cursor"""
-        if self._conn is None:
-            self._conn = sqlite3.connect(self.filename,
-                                         check_same_thread=False)
-        return self._conn.cursor()
-
     def _execute(self, stmt, *values):
         """
         Gets a cursor, executes `stmt` and closes the cursor,
         fetching one row afterwards and returning its result.
         """
-        c = self._cursor()
+        c = self._conn.cursor()
         try:
             return c.execute(stmt, values).fetchone()
         finally:
@@ -83,18 +88,28 @@ class SQLiteSession(SecretMemorySession):
 
     def close(self):
         """Closes the connection unless we're working in-memory"""
-        if self.filename != ':memory:':
-            if self._conn is not None:
-                self._conn.commit()
-                self._conn.close()
-                self._conn = None
+        if self._conn is not None:
+            self._conn.commit()
+            self._conn.close()
+            self._conn = None
 
-    def delete(self):
-        """Deletes the current session file"""
-        if self.filename == ':memory:':
-            return True
-        try:
-            os.remove(self.filename)
-            return True
-        except OSError:
-            return False
+    def get_temp_secret_chat_by_id(self, id):
+        row = self._execute(
+            f"select * from {TABLE_NAME} where type='temp' and id = ?", id)
+        if row:
+            input_chat = InputEncryptedChat(chat_id=row[0], access_hash=row[1])
+            return SecretChat(id=row[0], access_hash=row[1], auth_key=row[2], admin=True if row[3] else False,
+                              user_id=row[4], in_seq_no_x=row[5], out_seq_no_x=row[6], in_seq_no=row[7],
+                              out_seq_no=row[8], layer=row[9], ttl=row[10], ttr=row[11], updated=row[12],
+                              created=row[13], mtproto=row[14], input_chat=input_chat)
+
+    def get_secret_chat_by_id(self, id):
+        row = self._execute(
+            f"select * from {TABLE_NAME} where type='normal' and id = ?", id)
+
+        if row:
+            input_chat = InputEncryptedChat(chat_id=row[0], access_hash=row[1])
+            return SecretChat(id=row[0], access_hash=row[1], auth_key=row[2], admin=True if row[3] else False,
+                              user_id=row[4], in_seq_no_x=row[5], out_seq_no_x=row[6], in_seq_no=row[7],
+                              out_seq_no=row[8], layer=row[9], ttl=row[10], ttr=row[11], updated=row[12],
+                              created=row[13], mtproto=row[14], input_chat=input_chat)

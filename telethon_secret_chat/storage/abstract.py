@@ -5,13 +5,11 @@ class SecretSession(ABC):
     def __init__(self):
         pass
 
-
-
     @property
     @abstractmethod
     def temp_secret_chat(self):
         """
-        Returns a list of temporary ``Chats`` instance that are used
+        Returns a list of temporary ``SecretChat`` instance that are used
         to create and accept secret chats. (they will be deleted)
         """
         raise NotImplementedError
@@ -20,7 +18,7 @@ class SecretSession(ABC):
     @abstractmethod
     def temp_secret_chat(self, value):
         """
-        Sets a list of temporary ``Chats`` instance that are used
+        Sets a list of temporary ``SecretChat`` instance that are used
         to create and accept secret chats. (they will be deleted)
         """
         raise NotImplementedError
@@ -29,7 +27,7 @@ class SecretSession(ABC):
     @abstractmethod
     def secret_chats(self):
         """
-        Returns a list of ``Chats`` instance that will be saved for
+        Returns a list of ``SecretChat`` instance that will be saved for
         future usage
         """
         raise NotImplementedError
@@ -38,7 +36,7 @@ class SecretSession(ABC):
     @abstractmethod
     def secret_chats(self, value):
         """
-        Sets a list of ``Chats`` instance
+        Sets a list of ``SecretChat`` instance
         """
         raise NotImplementedError
 
@@ -61,5 +59,19 @@ class SecretSession(ABC):
     def delete(self):
         """
         Should delete the stored information from disk since it's not valid anymore.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_temp_secret_chat_by_id(self, id):
+        """
+        Returns a temporary secret ``SecretChat`` instance
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_secret_chat_by_id(self, id):
+        """
+        Returns a secret ``SecretChat`` instance
         """
         raise NotImplementedError

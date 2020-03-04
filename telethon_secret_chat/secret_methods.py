@@ -47,33 +47,44 @@ def _old_calc_key(auth_key, msg_key, client):
     return aes_key, aes_iv
 
 
-class Chats:
+class SecretChat:
     def __init__(self, id: int, access_hash: int, auth_key: bytes, admin: bool, user_id: int,
-                 input_chat: InputEncryptedChat):
+                 input_chat: InputEncryptedChat, created=time(), updated=time(), in_seq_no_x=None,
+                 out_seq_no_x=None, in_seq_no=0, out_seq_no=0, layer=DEFAULT_LAYER, ttl=0, ttr=100,
+                 mtproto=1):
         self.id = id
         self.access_hash = access_hash
         self.auth_key = auth_key
         self.admin = admin
         self.user_id = user_id
         self.input_chat = input_chat
-        self.in_seq_no_x = 0 if admin else 1
-        self.out_seq_no_x = 1 if admin else 0
-        self.in_seq_no = 0
-        self.out_seq_no = 0
-        self.layer = DEFAULT_LAYER
-        self.ttl = 0
-        self.ttr = 100
-        self.updated = time()
+        if not in_seq_no_x:
+            self.in_seq_no_x = 0 if admin else 1
+        else:
+            self.in_seq_no_x = in_seq_no_x
+        if not out_seq_no_x:
+
+            self.out_seq_no_x = 1 if admin else 0
+        else:
+            self.out_seq_no_x = out_seq_no_x
+        self.in_seq_no = in_seq_no
+        self.out_seq_no = out_seq_no
+        self.layer = layer
+        self.ttl = ttl
+        self.ttr = ttr
+        self.updated = updated
+        # TODO store these maybe too
         self.incoming = {}
         self.outgoing = {}
-        self.created = time()
+        self.created = created
+        # We probably don't need to store these
         self.rekeying = [0]
-        self.mtproto = 1
+        self.mtproto = mtproto
 
 
 class SecretChatMethods:
 
-    def get_secret_chat(self, chat_id) -> Chats:
+    def get_secret_chat(self, chat_id) -> SecretChat:
         if isinstance(chat_id, int):
             peer = self.secret_chats.get(chat_id, None)
             if not peer:
@@ -231,7 +242,7 @@ class SecretChatMethods:
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
         self._log.client[__name__].debug(f'Secret chat {peer} rekeyed succrsfully')
 
-    async def handle_decrypted_message(self, decrypted_message, peer: Chats, file):
+    async def handle_decrypted_message(self, decrypted_message, peer: SecretChat, file):
         if isinstance(decrypted_message, (DecryptedMessageService, DecryptedMessageService8)):
             if isinstance(decrypted_message.action, DecryptedMessageActionRequestKey):
                 await self.accept_rekey(peer, decrypted_message.action)
@@ -573,8 +584,8 @@ class SecretChatMethods:
 
         key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
-        secret_chat = Chats(chat.id, chat.access_hash, auth_key, admin=False, user_id=chat.admin_id,
-                            input_chat=input_peer)
+        secret_chat = SecretChat(chat.id, chat.access_hash, auth_key, admin=False, user_id=chat.admin_id,
+                                 input_chat=input_peer)
         self.secret_chats[chat.id] = secret_chat
         g_b = pow(dh_config.g, b, dh_config.p)
         self.check_g_a(g_b, dh_config.p)
@@ -594,12 +605,6 @@ class SecretChatMethods:
         if key_fingerprint != chat.key_fingerprint:
             raise ValueError("Wrong fingerprint")
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
-        self.secret_chats[chat.id] = Chats(
-            chat.id,
-            chat.access_hash,
-            auth_key,
-            True,
-            chat.participant_id,
-            input_peer
-        )
+        self.secret_chats[chat.id] = SecretChat(chat.id, chat.access_hash, auth_key, True, chat.participant_id,
+                                                input_peer)
         await self.notify_layer(chat)
