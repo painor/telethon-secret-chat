@@ -131,7 +131,7 @@ class SecretChatMethods:
         g_a = pow(dh_config.g, a, dh_config.p)
         self.check_g_a(g_a, dh_config.p)
         res = await self.client(RequestEncryptionRequest(user_id=peer, g_a=g_a.to_bytes(256, 'big', signed=False)))
-        temp_chat = SecretChat(res.id, a, b'', False, 0, None)
+        temp_chat = SecretChat(res.id, 0, a.to_bytes(256, 'big', signed=False), False, 0, None)
         self.session.save_chat(temp_chat, True)
         return res.id
 
@@ -405,11 +405,9 @@ class SecretChatMethods:
             message = DecryptedMessage46(ttl, message, reply_to_random_id=reply_to_id)
         else:
             message = DecryptedMessage(ttl, message, reply_to_random_id=reply_to_id)
-        print("sending message", message)
         data = await self.encrypt_secret_message(peer_id, message)
         res = await self.client(
             SendEncryptedRequest(peer=peer.input_chat, data=data))
-        print("sent message. res is ",res)
         return res
 
     async def upload_secret_file(self, file):
@@ -534,17 +532,16 @@ class SecretChatMethods:
 
     def decrypt_mtproto2(self, message_key, chat_id, encrypted_data):
         peer = self.get_secret_chat(chat_id)
-
-        aes_key, aes_iv = MTProtoState._calc_key(self.get_secret_chat(chat_id).auth_key,
+        aes_key, aes_iv = MTProtoState._calc_key(peer.auth_key,
                                                  message_key,
-                                                 not self.get_secret_chat(chat_id).admin)
+                                                 not peer.admin)
 
         decrypted_data = AES.decrypt_ige(encrypted_data, aes_key, aes_iv)
         message_data_length = struct.unpack('<I', decrypted_data[:4])[0]
         message_data = decrypted_data[4:message_data_length + 4]
         if message_data_length > len(decrypted_data):
             raise SecurityError("message data length is too big")
-        is_admin = peer.admin
+        is_admin = (8 if peer.admin else 0)
         first_str = peer.auth_key[88 + is_admin:88 + 32 + is_admin]
 
         if message_key != sha256(first_str + decrypted_data).digest()[8:24]:
@@ -563,6 +560,7 @@ class SecretChatMethods:
         decrypted_data = AES.decrypt_ige(encrypted_data, aes_key, aes_iv)
         message_data_length = struct.unpack('<I', decrypted_data[:4])[0]
         message_data = decrypted_data[4:message_data_length + 4]
+
         if message_data_length > len(decrypted_data):
             raise SecurityError("message data length is too big")
 
@@ -603,7 +601,9 @@ class SecretChatMethods:
         dh_config = await self.get_dh_config()
         g_a_or_b = int.from_bytes(chat.g_a_or_b, "big", signed=False)
         self.check_g_a(g_a_or_b, dh_config.p)
-        auth_key = pow(g_a_or_b, self.session.get_temp_secret_chat_by_id(chat.id).access_hash, dh_config.p).to_bytes(
+        a = self.session.get_temp_secret_chat_by_id(chat.id).auth_key
+        a = int.from_bytes(a,"big",signed=False)
+        auth_key = pow(g_a_or_b, a, dh_config.p).to_bytes(
             256, "big", signed=False)
         self.session.remove_secret_chat_by_id(chat.id, True)
         key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]

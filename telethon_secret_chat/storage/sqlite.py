@@ -39,7 +39,7 @@ class SecretSQLiteSession(SecretMemorySession):
             self._create_table(
                 c,
                 f"""{TABLE_NAME} (
-                  id integer primary key,
+                  id integer,
                   access_hash integer,
                   auth_key blob,
                   admin integer,
@@ -98,10 +98,12 @@ class SecretSQLiteSession(SecretMemorySession):
             chat.id, chat.access_hash, chat.auth_key, 1 if chat.admin else 0, chat.user_id, chat.in_seq_no_x,
             chat.out_seq_no_x, chat.in_seq_no, chat.out_seq_no, chat.layer, chat.ttl, chat.ttr, chat.updated,
             chat.created, chat.mtproto, temp)
-
+        print("saving new chat", row)
+        print(temp)
         try:
             c.execute(
                 f'insert or replace into {TABLE_NAME} values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', row)
+            self.save()
         finally:
             c.close()
 
@@ -127,6 +129,7 @@ class SecretSQLiteSession(SecretMemorySession):
                               created=row[13], mtproto=row[14], input_chat=input_chat)
 
     def remove_secret_chat_by_id(self, id, temp=False):
+        print("removing chat with id", id, "and is ", temp)
         c = self._conn.cursor()
         try:
             c.execute(f"delete from {TABLE_NAME} where id=? and temp=?", (id, 1 if temp else 0))
