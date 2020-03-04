@@ -2,6 +2,7 @@ import sqlite3
 from enum import Enum
 
 from telethon import TelegramClient
+from telethon.sessions import SQLiteSession
 from telethon.tl import types
 from telethon.tl.alltlobjects import tlobjects
 
@@ -29,10 +30,14 @@ class SecretChatManager(SecretChatMethods):
         self.client = client
         if not session:
             self.session = SecretMemorySession()
-
         elif isinstance(session, sqlite3.Connection):
             self.session = SecretSQLiteSession(session)
+        elif isinstance(session, SQLiteSession):
+            self.session = SecretSQLiteSession(session._conn)
+        else:
+            self.session = session
         self.client.add_event_handler(self._secret_chat_event_loop)
+        self._log = client._log
 
     def add_secret_event_handler(self, event_type=SECRET_TYPES.decrypt, func=None):
         if event_type != SECRET_TYPES.decrypt and event_type != SECRET_TYPES.accept or not func:
@@ -40,17 +45,19 @@ class SecretChatManager(SecretChatMethods):
         # deal with patterns etc
         self.secret_events.append((event_type, func))
 
-    def patch_event(self, event):
-
+    def patch_event(self, event, decrypted_event):
+        print("patching")
         async def reply(message, ttl=0):
+            print("sending the mlessage")
             return await self.send_secret_message(event.message.chat_id, message, ttl,
-                                                  event.random_id)
+                                                  decrypted_event.random_id)
 
         async def respond(message, ttl=0):
             return await self.send_secret_message(event.message.chat_id, message, ttl)
 
+        event.decrypted_event = decrypted_event
         event.reply = reply
-        event.response = respond
+        event.respond = respond
 
     async def _secret_chat_event_loop(self, event):
         if 0x1be31789 not in tlobjects:  # check for decryptedMessage constructor
@@ -74,7 +81,9 @@ class SecretChatManager(SecretChatMethods):
                 if event_type == SECRET_TYPES.decrypt:
                     if not decrypted_event:
                         decrypted_event = await self.handle_encrypted_update(event)
-                        if decrypted_event is None:
+                        if "DecryptedMessage" not in type(decrypted_event).__name__:
                             return
-                        self.patch_event(decrypted_event)
-                    self.client.loop.create_task(callback(decrypted_event))
+                        print("good event")
+
+                        self.patch_event(event, decrypted_event)
+                    self.client.loop.create_task(callback(event))

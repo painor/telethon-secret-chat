@@ -4,7 +4,7 @@ import struct
 from hashlib import sha1, sha256, md5
 from time import time
 
-from telethon import utils, TelegramClient
+from telethon import utils
 from telethon.crypto import AES
 from telethon.errors import SecurityError, EncryptionAlreadyDeclinedError
 from telethon.extensions import BinaryReader
@@ -16,7 +16,6 @@ from telethon.tl.types import InputEncryptedChat, TypeEncryptedChat, EncryptedFi
     InputFileBig, InputFile, InputEncryptedFileBigUploaded, InputEncryptedFileUploaded
 from telethon.tl.types.messages import DhConfigNotModified, DhConfig
 
-from telethon_secret_chat.storage.memory import SecretMemorySession
 from .secret_sechma.secretTL import DecryptedMessageService, DecryptedMessageActionRequestKey, \
     DecryptedMessageActionAcceptKey, DecryptedMessageActionAbortKey, DecryptedMessageActionCommitKey, \
     DecryptedMessageActionNoop, DecryptedMessageService8, DecryptedMessageActionNotifyLayer, \
@@ -84,11 +83,6 @@ class SecretChat:
 
 
 class SecretChatMethods:
-    def __init__(self):
-        self._log = None
-        self.session = SecretMemorySession()
-        self.client = TelegramClient("a", 1, "1")
-        self.temp_rekeyed_secret_chats = {}
 
     def get_secret_chat(self, chat_id) -> SecretChat:
         if isinstance(chat_id, int):
@@ -151,7 +145,7 @@ class SecretChatMethods:
 
     async def rekey(self, peer):
         peer = self.get_secret_chat(peer)
-        self._log.client[__name__].debug(f'Rekeying secret chat {peer}')
+        self._log[__name__].debug(f'Rekeying secret chat {peer}')
         dh_config = await self.get_dh_config()
         a = int.from_bytes(os.urandom(256), 'big', signed=False)
         g_a = pow(dh_config.g, a, dh_config.p)
@@ -178,7 +172,7 @@ class SecretChatMethods:
             if my_exchange_id == other_exchange_id:
                 peer.rekeying = [0]
                 return
-        self._log.client[__name__].debug(f'Accepting rekeying secret chat {peer}')
+        self._log[__name__].debug(f'Accepting rekeying secret chat {peer}')
         dh_config = await self.get_dh_config()
         random_bytes = os.urandom(256)
         b = int.from_bytes(random_bytes, byteorder="big", signed=False)
@@ -204,7 +198,7 @@ class SecretChatMethods:
         if peer.rekeying[0] != 1 or not self.temp_rekeyed_secret_chats.get(action.exchange_id, None):
             peer.rekeying = [0]
             return
-        self._log.client[__name__].debug(f'Committing rekeying secret chat {peer}')
+        self._log[__name__].debug(f'Committing rekeying secret chat {peer}')
         dh_config = await self.get_dh_config()
         g_b = int.from_bytes(action.g_b, 'big', signed=False)
         self.check_g_a(g_b, dh_config.p)
@@ -242,7 +236,7 @@ class SecretChatMethods:
             await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
             raise SecurityError("Invalid Key fingerprint")
 
-        self._log.client[__name__].debug(f'Completing rekeying secret chat {peer}')
+        self._log[__name__].debug(f'Completing rekeying secret chat {peer}')
         peer.rekeying = [0]
         peer.auth_key = self.temp_rekeyed_secret_chats[action.exchange_id]
         peer.ttr = 100
@@ -251,7 +245,7 @@ class SecretChatMethods:
         message = DecryptedMessageService(action=DecryptedMessageActionNoop())
         message = await self.encrypt_secret_message(peer, message)
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
-        self._log.client[__name__].debug(f'Secret chat {peer} rekeyed succrsfully')
+        self._log[__name__].debug(f'Secret chat {peer} rekeyed succrsfully')
 
     async def handle_decrypted_message(self, decrypted_message, peer: SecretChat, file):
         if isinstance(decrypted_message, (DecryptedMessageService, DecryptedMessageService8)):
@@ -281,7 +275,7 @@ class SecretChatMethods:
                 decrypted_message.action.end_seq_no -= peer.out_seq_no_x
                 decrypted_message.action.start_seq_no //= 2
                 decrypted_message.action.end_seq_no //= 2
-                self._log.client[__name__].warning(f"Resending messages for {peer.id}")
+                self._log[__name__].warning(f"Resending messages for {peer.id}")
                 for seq, message in peer.outgoing:
                     if decrypted_message.action.start_seq_no <= seq <= decrypted_message.action.end_seq_no:
                         await self.send_secret_message(peer.id, message.message)
@@ -304,7 +298,7 @@ class SecretChatMethods:
 
     async def handle_encrypted_update(self, event):
         if not self.session.get_secret_chat_by_id(event.message.chat_id):
-            self._log.client[__name__].debug("Secret chat not saved. skipping")
+            self._log[__name__].debug("Secret chat not saved. skipping")
             return False
         message = event.message
 
@@ -328,7 +322,7 @@ class SecretChatMethods:
                 decrypted_message = self.decrypt_mtproto1(bytes.fromhex(message_key.hex()), message.chat_id,
                                                           bytes.fromhex(encrypted_data.hex()))
                 peer.mtproto = 1
-                self._log.client[__name__].debug(f"Used MTProto 1 with chat {message.chat_id}")
+                self._log[__name__].debug(f"Used MTProto 1 with chat {message.chat_id}")
 
         else:
             try:
@@ -339,7 +333,7 @@ class SecretChatMethods:
                 decrypted_message = self.decrypt_mtproto2(bytes.fromhex(message_key.hex()), message.chat_id,
                                                           bytes.fromhex(encrypted_data.hex()))
                 peer.mtproto = 2
-                self._log.client[__name__].debug(f"Used MTProto 2 with chat {message.chat_id}")
+                self._log[__name__].debug(f"Used MTProto 2 with chat {message.chat_id}")
         peer.ttr -= 1
         if (peer.ttr <= 0 or (time() - peer.updated) > 7 * 24 * 60 * 60) and peer.rekeying[0] == 0:
             await self.rekey(peer)
@@ -411,9 +405,11 @@ class SecretChatMethods:
             message = DecryptedMessage46(ttl, message, reply_to_random_id=reply_to_id)
         else:
             message = DecryptedMessage(ttl, message, reply_to_random_id=reply_to_id)
+        print("sending message", message)
         data = await self.encrypt_secret_message(peer_id, message)
         res = await self.client(
             SendEncryptedRequest(peer=peer.input_chat, data=data))
+        print("sent message. res is ",res)
         return res
 
     async def upload_secret_file(self, file):
@@ -534,7 +530,7 @@ class SecretChatMethods:
         try:
             await self.client(DiscardEncryptionRequest(peer.id))
         except EncryptionAlreadyDeclinedError:
-            self._log.client[__name__].debug(f"Chat {peer.id} already closed")
+            self._log[__name__].debug(f"Chat {peer.id} already closed")
 
     def decrypt_mtproto2(self, message_key, chat_id, encrypted_data):
         peer = self.get_secret_chat(chat_id)

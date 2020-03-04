@@ -1,6 +1,3 @@
-import datetime
-import os
-
 from telethon.tl.types import InputEncryptedChat
 
 from telethon_secret_chat.secret_methods import SecretChat
@@ -36,7 +33,7 @@ class SecretSQLiteSession(SecretMemorySession):
         self._conn = sqlite_connection
         c = self._conn.cursor()
         c.execute("select name from sqlite_master "
-                  f"where type='table' and name={TABLE_NAME}")
+                  f"where type='table' and name='{TABLE_NAME}'")
         if not c.fetchone():
             # Tables don't exist, create new ones
             self._create_table(
@@ -57,7 +54,7 @@ class SecretSQLiteSession(SecretMemorySession):
                   updated integer,
                   created integer,
                   mtproto integer,
-                  temp integer,
+                  temp integer
                 )"""
             )
 
@@ -103,7 +100,7 @@ class SecretSQLiteSession(SecretMemorySession):
             chat.created, chat.mtproto, temp)
 
         try:
-            c.executemany(
+            c.execute(
                 f'insert or replace into {TABLE_NAME} values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', row)
         finally:
             c.close()
