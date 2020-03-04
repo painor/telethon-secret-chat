@@ -45,5 +45,33 @@ Examples :
     manager.add_secret_event_handler(func=replier) # we can specify the type of the event
     client.run_until_disconnected()
 
+To start a secret chat you can call
+
+::
+
+    manager.start_secret_chat(target)
+
+to use sqlite as a storage session you need to pass an sqlite connection to `SecretChatManager`
+
+::
+
+        manager = SecretChatManager(client,session=db_conn, auto_accept=True)
+        # you can also pass client.session from telethon as such
+        manager = SecretChatManager(client,session=client.session, auto_accept=True)
+
+to manually accept incoming you can do as follow
+
+::
+
+        from telethon_secret_chat import SecretChatManager, SECRET_TYPES
+        manager = SecretChatManager(client, auto_accept=False)
+        manager.add_secret_event_handler(event_type=SECRET_TYPES.accept,func=accept_secret_chat_handler)
+
+in your handler you can do the following
+
+::
+
+    await manager.accept_secret_chat(event.chat)
+
 .. _`https://core.telegram.org/api/end-to-end`: https://core.telegram.org/api/end-to-end
 .. _`https://github.com/danog/MadelineProto`: https://github.com/danog/MadelineProto
