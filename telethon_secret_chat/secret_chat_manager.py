@@ -5,7 +5,7 @@ from telethon import TelegramClient
 from telethon.sessions import SQLiteSession
 from telethon.tl import types
 from telethon.tl.alltlobjects import tlobjects
-
+from .storage.abstract import SecretSession
 from .storage.sqlite import SecretSQLiteSession
 from .storage.memory import SecretMemorySession
 from .secret_sechma import secret_tlobjects
@@ -23,7 +23,7 @@ def patch_tlobjects():
 
 class SecretChatManager(SecretChatMethods):
 
-    def __init__(self, client: TelegramClient, session=None, auto_accept=False):
+    def __init__(self, client: TelegramClient, session: SecretSession = None, auto_accept: bool = False):
         self.secret_events = []
         self.dh_config = None
         self.auto_accept = auto_accept
@@ -37,7 +37,7 @@ class SecretChatManager(SecretChatMethods):
         else:
             self.session = session
         self.client.add_event_handler(self._secret_chat_event_loop)
-        self._log = client._log
+        self._log = client._log["secret_chat"]
 
     def add_secret_event_handler(self, event_type=SECRET_TYPES.decrypt, func=None):
         if event_type != SECRET_TYPES.decrypt and event_type != SECRET_TYPES.accept or not func:
@@ -46,13 +46,12 @@ class SecretChatManager(SecretChatMethods):
         self.secret_events.append((event_type, func))
 
     def patch_event(self, event, decrypted_event):
-        print("patching")
-        async def reply(message, ttl=0):
-            print("sending the mlessage")
+
+        async def reply(message: str, ttl: int = 0):
             return await self.send_secret_message(event.message.chat_id, message, ttl,
                                                   decrypted_event.random_id)
 
-        async def respond(message, ttl=0):
+        async def respond(message: str, ttl: int = 0):
             return await self.send_secret_message(event.message.chat_id, message, ttl)
 
         event.decrypted_event = decrypted_event
