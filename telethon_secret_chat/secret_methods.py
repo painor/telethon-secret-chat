@@ -47,18 +47,12 @@ def _old_calc_key(auth_key, msg_key, client):
     return aes_key, aes_iv
 
 
-class ChatKey:
-    def __init__(self, auth_key: bytes):
-        self.auth_key = auth_key
-        self.fingerprint = None
-
-
 class Chats:
-    def __init__(self, id: int, access_hash: int, key: ChatKey, admin: bool, user_id: int,
+    def __init__(self, id: int, access_hash: int, auth_key: bytes, admin: bool, user_id: int,
                  input_chat: InputEncryptedChat):
         self.id = id
         self.access_hash = access_hash
-        self.key = key
+        self.auth_key = auth_key
         self.admin = admin
         self.user_id = user_id
         self.input_chat = input_chat
@@ -170,16 +164,15 @@ class SecretChatMethods:
         self.check_g_a(g_a, dh_config.p)
         res = pow(g_a, b, dh_config.p)
         auth_key = res.to_bytes(256, 'big', signed=False)
-        key = ChatKey(auth_key)
-        key.fingerprint = struct.unpack('<q', sha1(key.auth_key).digest()[-8:])[0]
-        self.temp_rekeyed_secret_chats[action.exchange_id] = key
+        key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
+        self.temp_rekeyed_secret_chats[action.exchange_id] = auth_key
         peer.rekeying = [2, action.exchange_id]
         g_b = pow(dh_config.g, b, dh_config.p)
         self.check_g_a(g_b, dh_config.p)
         message = DecryptedMessageService(action=DecryptedMessageActionAcceptKey(
             g_b=g_b.to_bytes(256, 'big', signed=False),
             exchange_id=action.exchange_id,
-            key_fingerprint=key.fingerprint
+            key_fingerprint=key_fingerprint
         ))
         message = await self.encrypt_secret_message(peer, message)
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
@@ -195,9 +188,8 @@ class SecretChatMethods:
         self.check_g_a(g_b, dh_config.p)
         res = pow(g_b, self.temp_rekeyed_secret_chats[action.exchange_id], dh_config.p)
         auth_key = res.to_bytes(256, 'big', signed=False)
-        key = ChatKey(auth_key)
-        key.fingerprint = struct.unpack('<q', sha1(key.auth_key).digest()[-8:])[0]
-        if key.fingerprint != action.key_fingerprint:
+        key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
+        if key_fingerprint != action.key_fingerprint:
             message = DecryptedMessageService(action=DecryptedMessageActionAbortKey(
                 exchange_id=action.exchange_id,
             ))
@@ -206,13 +198,13 @@ class SecretChatMethods:
             raise SecurityError("Invalid Key fingerprint")
         message = DecryptedMessageService(action=DecryptedMessageActionCommitKey(
             exchange_id=action.exchange_id,
-            key_fingerprint=key.fingerprint
+            key_fingerprint=key_fingerprint
         ))
         message = await self.encrypt_secret_message(peer, message)
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
         del self.temp_rekeyed_secret_chats[action.exchange_id]
         peer.rekeying = [0]
-        peer.key = key
+        peer.auth_key = auth_key
         peer.ttl = 100
         peer.updated = time()
 
@@ -220,7 +212,7 @@ class SecretChatMethods:
         peer = self.get_secret_chat(peer)
         if peer.rekeying[0] != 2 or self.temp_rekeyed_secret_chats.get(action.exchange_id, None):
             return
-        if self.temp_rekeyed_secret_chats.get[action.exchange_id] != action.key_fingerprint:
+        if self.temp_rekeyed_secret_chats.get(action.exchange_id) != action.key_fingerprint:
             message = DecryptedMessageService(action=DecryptedMessageActionAbortKey(
                 exchange_id=action.exchange_id,
             ))
@@ -230,7 +222,7 @@ class SecretChatMethods:
 
         self._log.client[__name__].debug(f'Completing rekeying secret chat {peer}')
         peer.rekeying = [0]
-        peer.key = self.temp_rekeyed_secret_chats[action.exchange_id]
+        peer.auth_key = self.temp_rekeyed_secret_chats[action.exchange_id]
         peer.ttr = 100
         peer.updated = time()
         del self.temp_rekeyed_secret_chats[action.exchange_id]
@@ -298,8 +290,9 @@ class SecretChatMethods:
 
         auth_key_id = struct.unpack('<q', message.bytes[:8])[0]
         peer = self.get_secret_chat(message.chat_id)
-        if not peer.key.fingerprint or \
-                auth_key_id != peer.key.fingerprint:
+        key_fingerprint = struct.unpack('<q', sha1(peer.auth_key).digest()[-8:])[0]
+
+        if auth_key_id != key_fingerprint:
             await self.close_secret_chat(message.chat_id)
             raise ValueError("Key fingerprint mismatch. Chat closed")
 
@@ -354,19 +347,20 @@ class SecretChatMethods:
                 padding += 16
             message += os.urandom(padding)
             is_admin = (0 if peer.admin else 8)
-            first_str = peer.key.auth_key[88 + is_admin:88 + 32 + is_admin]
+            first_str = peer.auth_key[88 + is_admin:88 + 32 + is_admin]
             message_key = sha256(first_str + message).digest()[8:24]
-            aes_key, aes_iv = MTProtoState._calc_key(peer.key.auth_key, message_key,
+            aes_key, aes_iv = MTProtoState._calc_key(peer.auth_key, message_key,
                                                      peer.admin)
         else:
             message_key = sha1(message).digest()[-16:]
-            aes_key, aes_iv = _old_calc_key(peer.key.auth_key, message_key,
+            aes_key, aes_iv = _old_calc_key(peer.auth_key, message_key,
                                             True)
             padding = (16 - len(message) % 16) % 16
             message += os.urandom(padding)
-        message = struct.pack('<q', peer.key.fingerprint) + message_key + AES.encrypt_ige(bytes.fromhex(message.hex()),
-                                                                                          aes_key,
-                                                                                          aes_iv)
+        key_fingerprint = struct.unpack('<q', sha1(peer.auth_key).digest()[-8:])[0]
+        message = struct.pack('<q', key_fingerprint) + message_key + AES.encrypt_ige(bytes.fromhex(message.hex()),
+                                                                                     aes_key,
+                                                                                     aes_iv)
         return message
 
     async def download_secret_media(self, message):
@@ -526,7 +520,7 @@ class SecretChatMethods:
     def decrypt_mtproto2(self, message_key, chat_id, encrypted_data):
         peer = self.get_secret_chat(chat_id)
 
-        aes_key, aes_iv = MTProtoState._calc_key(self.secret_chats[chat_id].key.auth_key,
+        aes_key, aes_iv = MTProtoState._calc_key(self.secret_chats[chat_id].auth_key,
                                                  message_key,
                                                  not self.secret_chats[chat_id].admin)
 
@@ -536,7 +530,7 @@ class SecretChatMethods:
         if message_data_length > len(decrypted_data):
             raise SecurityError("message data length is too big")
         is_admin = peer.admin
-        first_str = peer.key.auth_key[88 + is_admin:88 + 32 + is_admin]
+        first_str = peer.auth_key[88 + is_admin:88 + 32 + is_admin]
 
         if message_key != sha256(first_str + decrypted_data).digest()[8:24]:
             raise SecurityError("Message key mismatch")
@@ -548,7 +542,7 @@ class SecretChatMethods:
         return BinaryReader(message_data).tgread_object()
 
     def decrypt_mtproto1(self, message_key, chat_id, encrypted_data):
-        aes_key, aes_iv = _old_calc_key(self.secret_chats[chat_id].key.auth_key,
+        aes_key, aes_iv = _old_calc_key(self.secret_chats[chat_id].auth_key,
                                         message_key,
                                         True)
         decrypted_data = AES.decrypt_ige(encrypted_data, aes_key, aes_iv)
@@ -576,16 +570,17 @@ class SecretChatMethods:
         self.check_g_a(g_a, dh_config.p)
         res = pow(g_a, b, dh_config.p)
         auth_key = res.to_bytes(256, 'big', signed=False)
-        key = ChatKey(auth_key)
-        key.fingerprint = struct.unpack('<q', sha1(key.auth_key).digest()[-8:])[0]
+
+        key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
-        secret_chat = Chats(chat.id, chat.access_hash, key, admin=False, user_id=chat.admin_id, input_chat=input_peer)
+        secret_chat = Chats(chat.id, chat.access_hash, auth_key, admin=False, user_id=chat.admin_id,
+                            input_chat=input_peer)
         self.secret_chats[chat.id] = secret_chat
         g_b = pow(dh_config.g, b, dh_config.p)
         self.check_g_a(g_b, dh_config.p)
         result = await self.client(
             AcceptEncryptionRequest(input_peer, g_b=g_b.to_bytes(256, 'big', signed=False),
-                                    key_fingerprint=key.fingerprint))
+                                    key_fingerprint=key_fingerprint))
         await self.notify_layer(chat)
         return result
 
@@ -595,17 +590,14 @@ class SecretChatMethods:
         self.check_g_a(g_a_or_b, dh_config.p)
         auth_key = pow(g_a_or_b, self.temp_secret_chat[chat.id], dh_config.p).to_bytes(256, "big", signed=False)
         del self.temp_secret_chat[chat.id]
-        key = ChatKey(auth_key)
-        key.fingerprint = struct.unpack('<q', sha1(key.auth_key).digest()[-8:])[0]
-        if key.fingerprint != chat.key_fingerprint:
+        key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
+        if key_fingerprint != chat.key_fingerprint:
             raise ValueError("Wrong fingerprint")
-        key.visualization_orig = sha1(key.auth_key).digest()[16:]
-        key.visualization_46 = sha256(key.auth_key).digest()[20:]
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
         self.secret_chats[chat.id] = Chats(
             chat.id,
             chat.access_hash,
-            key,
+            auth_key,
             True,
             chat.participant_id,
             input_peer

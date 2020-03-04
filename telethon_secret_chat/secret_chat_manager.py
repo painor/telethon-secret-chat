@@ -20,8 +20,6 @@ def patch_tlobjects():
 class SecretChatManager(SecretChatMethods):
 
     def __init__(self, client: TelegramClient, auto_accept=False):
-        self.temp_secret_chat = {}
-        self.secret_chats = {}
         self.secret_events = []
         self.dh_config = None
         self.auto_accept = auto_accept
