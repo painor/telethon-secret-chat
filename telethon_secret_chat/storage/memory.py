@@ -1,3 +1,4 @@
+from ..secret_methods import SecretChat
 from .abstract import SecretSession
 
 
@@ -34,9 +35,22 @@ class SecretMemorySession(SecretSession):
     def delete(self):
         pass
 
-    def get_temp_secret_chat_by_id(self, id):
-        return self._temp_rekeyed_secret_chats.get(id)
+    def save_chat(self, chat: SecretChat, temp=False):
+        if temp:
+            self._temp_secret_chat[chat.id] = chat
+        else:
+            self._secret_chats[chat.id] = chat
 
-    def get_secret_chat_by_id(self, id):
+    def get_temp_secret_chat_by_id(self, id) -> SecretChat:
+        return self._temp_secret_chat.get(id)
+
+    def get_secret_chat_by_id(self, id) -> SecretChat:
         return self._secret_chats.get(id)
 
+    def remove_secret_chat_by_id(self, id, temp=False) -> None:
+        if temp:
+            if id in self.temp_secret_chat:
+                del self._temp_secret_chat[id]
+        else:
+            if id in self.secret_chats:
+                del self._secret_chats[id]

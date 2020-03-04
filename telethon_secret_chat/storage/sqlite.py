@@ -128,3 +128,10 @@ class SecretSQLiteSession(SecretMemorySession):
                               user_id=row[4], in_seq_no_x=row[5], out_seq_no_x=row[6], in_seq_no=row[7],
                               out_seq_no=row[8], layer=row[9], ttl=row[10], ttr=row[11], updated=row[12],
                               created=row[13], mtproto=row[14], input_chat=input_chat)
+
+    def remove_secret_chat_by_id(self, id, temp=False):
+        c = self._conn.cursor()
+        try:
+            c.execute(f"delete from {TABLE_NAME} where id=? and temp=?", (id, 1 if temp else 0))
+        finally:
+            c.close()

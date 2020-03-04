@@ -75,3 +75,11 @@ class SecretSession(ABC):
         Returns a secret ``SecretChat`` instance
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def remove_secret_chat_by_id(self, id, temp=False):
+        """
+        Removes a secret chat from the storage
+        Useful when discarding secret chats
+        """
+        raise NotImplementedError
