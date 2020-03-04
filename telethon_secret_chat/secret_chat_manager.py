@@ -1,5 +1,6 @@
 import sqlite3
 from enum import Enum
+from typing import Callable
 
 from telethon import TelegramClient
 from telethon.sessions import SQLiteSession
@@ -39,7 +40,7 @@ class SecretChatManager(SecretChatMethods):
         self.client.add_event_handler(self._secret_chat_event_loop)
         self._log = client._log["secret_chat"]
 
-    def add_secret_event_handler(self, event_type=SECRET_TYPES.decrypt, func=None):
+    def add_secret_event_handler(self, event_type=SECRET_TYPES.decrypt, func: Callable = None):
         if event_type != SECRET_TYPES.decrypt and event_type != SECRET_TYPES.accept or not func:
             raise ValueError("Wrong params")
         # deal with patterns etc

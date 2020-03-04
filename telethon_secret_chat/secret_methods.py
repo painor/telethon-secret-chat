@@ -3,8 +3,7 @@ import random
 import struct
 from hashlib import sha1, sha256, md5
 from time import time
-
-from telethon import utils
+from telethon import utils, hints
 from telethon.crypto import AES
 from telethon.errors import SecurityError, EncryptionAlreadyDeclinedError
 from telethon.extensions import BinaryReader
@@ -13,8 +12,8 @@ from telethon.tl.functions.messages import AcceptEncryptionRequest, SendEncrypte
 from telethon.tl.functions.messages import GetDhConfigRequest, RequestEncryptionRequest, SendEncryptedServiceRequest, \
     DiscardEncryptionRequest, SendEncryptedRequest
 from telethon.tl.types import InputEncryptedChat, TypeEncryptedChat, EncryptedFile, InputEncryptedFileLocation, \
-    InputFileBig, InputFile, InputEncryptedFileBigUploaded, InputEncryptedFileUploaded
-from telethon.tl.types.messages import DhConfigNotModified, DhConfig
+    InputFileBig, InputFile, InputEncryptedFileBigUploaded, InputEncryptedFileUploaded, EncryptedChat
+from telethon.tl.types.messages import DhConfigNotModified, DhConfig, SentEncryptedMessage
 
 from .secret_sechma.secretTL import DecryptedMessageService, DecryptedMessageActionRequestKey, \
     DecryptedMessageActionAcceptKey, DecryptedMessageActionAbortKey, DecryptedMessageActionCommitKey, \
@@ -84,7 +83,7 @@ class SecretChat:
 
 class SecretChatMethods:
 
-    def get_secret_chat(self, chat_id) -> SecretChat:
+    def get_secret_chat(self, chat_id: [int, SecretChat]) -> SecretChat:
         if isinstance(chat_id, int):
             peer = self.session.get_secret_chat_by_id(chat_id)
             if not peer:
@@ -124,7 +123,7 @@ class SecretChatMethods:
             raise ValueError("g_a is invalid (1 < g_a < p - 1 is false).")
         return True
 
-    async def start_secret_chat(self, peer):
+    async def start_secret_chat(self, peer: 'hints.EntityLike'):
         peer = utils.get_input_user(await self.client.get_input_entity(peer))
         dh_config = await self.get_dh_config()
         a = int.from_bytes(os.urandom(256), 'big', signed=False)
@@ -340,7 +339,7 @@ class SecretChatMethods:
         peer.incoming[peer.in_seq_no] = message
         return await self.handle_decrypted_message(decrypted_message, peer, file)
 
-    async def encrypt_secret_message(self, peer, message):
+    async def encrypt_secret_message(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat], message):
         peer = self.get_secret_chat(peer)
         peer.ttr -= 1
         if peer.layer > 8:
@@ -397,7 +396,8 @@ class SecretChatMethods:
                                                 iv=message.media.iv)
         return media
 
-    async def send_secret_message(self, peer_id, message, ttl=0, reply_to_id=None):
+    async def send_secret_message(self, peer_id: [int, SecretChat, InputEncryptedChat, EncryptedChat], message: str,
+                                  ttl: int = 0, reply_to_id: [int, None] = None) -> SentEncryptedMessage:
         peer = self.get_secret_chat(peer_id)
         if peer.layer == 8:
             message = DecryptedMessage8(os.urandom(8), message, DecryptedMessageMediaEmpty())
@@ -426,7 +426,8 @@ class SecretChatMethods:
 
         return file, fingerprint, key, iv
 
-    async def send_secret_document(self, peer, document, thumb: bytes, thumb_w: int, thumb_h: int, file_name: str,
+    async def send_secret_document(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat], document,
+                                   thumb: bytes, thumb_w: int, thumb_h: int, file_name: str,
                                    mime_type: str, size: int, attributes=None, ttl=0, caption=""):
         if attributes is None:
             attributes = []
@@ -448,7 +449,8 @@ class SecretChatMethods:
         res = await self.client(SendEncryptedFileRequest(peer.input_chat, data, file=file))
         return res
 
-    async def send_secret_audio(self, peer, audio, duration, mime_type, size, ttl=0, caption=""):
+    async def send_secret_audio(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat], audio, duration,
+                                mime_type, size, ttl=0, caption=""):
         peer = self.get_secret_chat(peer)
         file, fingerprint, key, iv = await self.upload_secret_file(audio)
         if peer.layer == 8:
@@ -464,7 +466,8 @@ class SecretChatMethods:
         res = await self.client(SendEncryptedFileRequest(peer.input_chat, data, file=file))
         return res
 
-    async def send_secret_video(self, peer, video, thumb: bytes, thumb_w: int, thumb_h: int, duration: int,
+    async def send_secret_video(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat], video, thumb: bytes,
+                                thumb_w: int, thumb_h: int, duration: int,
                                 mime_type: str, w: int,
                                 h: int, size, ttl=0, caption=""):
         peer = self.get_secret_chat(peer)
@@ -488,7 +491,8 @@ class SecretChatMethods:
         res = await self.client(SendEncryptedFileRequest(peer.input_chat, data, file=file))
         return res
 
-    async def send_secret_photo(self, peer, image, thumb, thumb_w, thumb_h, w, h, size, caption="",
+    async def send_secret_photo(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat], image, thumb, thumb_w,
+                                thumb_h, w, h, size, caption="",
                                 ttl=0):
         peer = self.get_secret_chat(peer)
 
@@ -508,7 +512,7 @@ class SecretChatMethods:
         res = await self.client(SendEncryptedFileRequest(peer.input_chat, data, file=file))
         return res
 
-    async def notify_layer(self, peer):
+    async def notify_layer(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat]):
         peer = self.get_secret_chat(peer)
         if peer.layer == 8:
             return
@@ -519,7 +523,7 @@ class SecretChatMethods:
             SendEncryptedServiceRequest(peer=InputEncryptedChat(peer.id, peer.access_hash),
                                         data=data))
 
-    async def close_secret_chat(self, peer):
+    async def close_secret_chat(self, peer: [int, SecretChat, InputEncryptedChat, EncryptedChat]):
 
         if self.session.get_secret_chat_by_id(peer.id):
             self.session.remove_secret_chat_by_id(peer.id, False)
@@ -602,7 +606,7 @@ class SecretChatMethods:
         g_a_or_b = int.from_bytes(chat.g_a_or_b, "big", signed=False)
         self.check_g_a(g_a_or_b, dh_config.p)
         a = self.session.get_temp_secret_chat_by_id(chat.id).auth_key
-        a = int.from_bytes(a,"big",signed=False)
+        a = int.from_bytes(a, "big", signed=False)
         auth_key = pow(g_a_or_b, a, dh_config.p).to_bytes(
             256, "big", signed=False)
         self.session.remove_secret_chat_by_id(chat.id, True)
