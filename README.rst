@@ -4,7 +4,7 @@ telethon-secret-chat
 Secret chat plugin for telethon, `available on PyPi`_.
 
 This is still a work in progress so expect more commits to it. Originally
-based on the `End-to-End Encryption, Secret Chats` document, but it wasn't
+based on the `End-to-End Encryption, Secret Chats`_ document, but it wasn't
 clear enough so I followed their advice and checked one of the implementations
 that had it (`MadelineProto`_). Therefore, this pluigin is based on
 `Daniil`_'s implementation at its core.
