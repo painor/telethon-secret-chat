@@ -22,6 +22,7 @@ Features
 -  ☒ Saving secret chats keys to database [2]_
 -  ☐ Saving messages to database [3]_
 -  ☒ Automatic decryption/accepting/finishing
+-  ☐ Compatibility with `tdlib`_ [4]_
 
 .. [1] Every 100 messages you need to recreate the auth key.
 .. [2] Auth keys are saved client sides so if you restart the script you will
@@ -29,6 +30,9 @@ Features
        them.
 .. [3] There is no ``get_messages`` function in secret chats so users can't see
        old messages.
+.. [4] The secret chat implementation of `tdlib`_ differs from other clients,
+       so applications like Telegram X or the mac client may not work with
+       these chats.
 
 Installation
 ------------
@@ -97,3 +101,4 @@ In your handler, you can do the following:
 .. _`End-to-End Encryption, Secret Chats`: https://core.telegram.org/api/end-to-end
 .. _`MadelineProto`: https://github.com/danog/MadelineProto
 .. _`Daniil`: https://github.com/danog
+.. _`tdlib`: https://telegram.org/blog/tdlib
