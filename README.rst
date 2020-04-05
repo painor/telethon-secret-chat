@@ -44,6 +44,9 @@ Example
 
 .. code-block:: python
 
+    from telethon import TelegramClient
+    from telethon_secret_chat import SecretChatManager
+
     client = TelegramClient(...)
 
     async def replier(event):
@@ -51,9 +54,12 @@ Example
         if event.decrypted_event.message and event.decrypted_event.message == "hello":
             await event.reply("hi")
 
+
     manager = SecretChatManager(client, auto_accept=True)  # automatically accept new secret chats
     manager.add_secret_event_handler(func=replier)  # we can specify the type of the event
-    client.run_until_disconnected()
+
+    with client:
+        client.run_until_disconnected()
 
 To start a secret chat you can call:
 
