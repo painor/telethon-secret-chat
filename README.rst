@@ -56,10 +56,18 @@ Example
     async def replier(event):
         # all events are encrypted by default
         if event.decrypted_event.message and event.decrypted_event.message == "hello":
-            await event.reply("hi")
+            await event.reply("**hi**") # parse_mode is markdown by default
 
 
-    manager = SecretChatManager(client, auto_accept=True)  # automatically accept new secret chats
+    async def new_chat(chat, created_by_me):
+        if created_by_me:
+            print("User {} has accepted our secret chat request".format(chat))
+        else:
+            print("We have accepted the secret chat request of {}".format(chat))
+
+
+    manager = SecretChatManager(client, auto_accept=True,
+                                new_chat_created=new_chat)  # automatically accept new secret chats
     manager.add_secret_event_handler(func=replier)  # we can specify the type of the event
 
     with client:

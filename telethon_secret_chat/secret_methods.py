@@ -3,6 +3,8 @@ import random
 import struct
 from hashlib import sha1, sha256, md5
 from time import time
+
+import typing
 from telethon import utils, hints
 from telethon.crypto import AES
 from telethon.errors import SecurityError, EncryptionAlreadyDeclinedError
@@ -397,14 +399,21 @@ class SecretChatMethods:
         return media
 
     async def send_secret_message(self, peer_id: [int, SecretChat, InputEncryptedChat, EncryptedChat], message: str,
-                                  ttl: int = 0, reply_to_id: [int, None] = None) -> SentEncryptedMessage:
+                                  ttl: int = 0, reply_to_id: [int, None] = None, parse_mode: typing.Optional[str] = (),
+                                  ) -> SentEncryptedMessage:
+
+        message, msg_ent = await self.client._parse_message_text(message, parse_mode)
+        if not message:
+            raise ValueError(
+                'The message cannot be empty unless a file is provided'
+            )
         peer = self.get_secret_chat(peer_id)
         if peer.layer == 8:
             message = DecryptedMessage8(os.urandom(8), message, DecryptedMessageMediaEmpty())
         elif peer.layer == 46:
-            message = DecryptedMessage46(ttl, message, reply_to_random_id=reply_to_id)
+            message = DecryptedMessage46(ttl, message, reply_to_random_id=reply_to_id, entities=msg_ent)
         else:
-            message = DecryptedMessage(ttl, message, reply_to_random_id=reply_to_id)
+            message = DecryptedMessage(ttl, message, reply_to_random_id=reply_to_id, entities=msg_ent)
         data = await self.encrypt_secret_message(peer_id, message)
         res = await self.client(
             SendEncryptedRequest(peer=peer.input_chat, data=data))
