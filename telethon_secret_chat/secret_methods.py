@@ -152,7 +152,7 @@ class SecretChatMethods:
         g_a = pow(dh_config.g, a, dh_config.p)
         self.check_g_a(g_a, dh_config.p)
         e = random.randint(10000000, 99999999)
-        self.temp_rekeyed_secret_chats[e] = a
+        self._temp_rekeyed_secret_chats[e] = a
         peer.rekeying = [1, e]
         message = DecryptedMessageService(action=DecryptedMessageActionRequestKey(
             g_a=g_a.to_bytes(256, 'big', signed=False),
@@ -182,7 +182,7 @@ class SecretChatMethods:
         res = pow(g_a, b, dh_config.p)
         auth_key = res.to_bytes(256, 'big', signed=False)
         key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
-        self.temp_rekeyed_secret_chats[action.exchange_id] = auth_key
+        self._temp_rekeyed_secret_chats[action.exchange_id] = auth_key
         peer.rekeying = [2, action.exchange_id]
         g_b = pow(dh_config.g, b, dh_config.p)
         self.check_g_a(g_b, dh_config.p)
@@ -196,14 +196,14 @@ class SecretChatMethods:
 
     async def commit_rekey(self, peer, action: DecryptedMessageActionAcceptKey):
         peer = self.get_secret_chat(peer)
-        if peer.rekeying[0] != 1 or not self.temp_rekeyed_secret_chats.get(action.exchange_id, None):
+        if peer.rekeying[0] != 1 or not self._temp_rekeyed_secret_chats.get(action.exchange_id, None):
             peer.rekeying = [0]
             return
         self._log.debug(f'Committing rekeying secret chat {peer}')
         dh_config = await self.get_dh_config()
         g_b = int.from_bytes(action.g_b, 'big', signed=False)
         self.check_g_a(g_b, dh_config.p)
-        res = pow(g_b, self.temp_rekeyed_secret_chats[action.exchange_id], dh_config.p)
+        res = pow(g_b, self._temp_rekeyed_secret_chats[action.exchange_id], dh_config.p)
         auth_key = res.to_bytes(256, 'big', signed=False)
         key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
         if key_fingerprint != action.key_fingerprint:
@@ -219,7 +219,7 @@ class SecretChatMethods:
         ))
         message = await self.encrypt_secret_message(peer, message)
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
-        del self.temp_rekeyed_secret_chats[action.exchange_id]
+        del self._temp_rekeyed_secret_chats[action.exchange_id]
         peer.rekeying = [0]
         peer.auth_key = auth_key
         peer.ttl = 100
@@ -227,9 +227,9 @@ class SecretChatMethods:
 
     async def complete_rekey(self, peer, action: DecryptedMessageActionCommitKey):
         peer = self.get_secret_chat(peer)
-        if peer.rekeying[0] != 2 or self.temp_rekeyed_secret_chats.get(action.exchange_id, None):
+        if peer.rekeying[0] != 2 or self._temp_rekeyed_secret_chats.get(action.exchange_id, None):
             return
-        if self.temp_rekeyed_secret_chats.get(action.exchange_id) != action.key_fingerprint:
+        if self._temp_rekeyed_secret_chats.get(action.exchange_id) != action.key_fingerprint:
             message = DecryptedMessageService(action=DecryptedMessageActionAbortKey(
                 exchange_id=action.exchange_id,
             ))
@@ -239,10 +239,10 @@ class SecretChatMethods:
 
         self._log.debug(f'Completing rekeying secret chat {peer}')
         peer.rekeying = [0]
-        peer.auth_key = self.temp_rekeyed_secret_chats[action.exchange_id]
+        peer.auth_key = self._temp_rekeyed_secret_chats[action.exchange_id]
         peer.ttr = 100
         peer.updated = time()
-        del self.temp_rekeyed_secret_chats[action.exchange_id]
+        del self._temp_rekeyed_secret_chats[action.exchange_id]
         message = DecryptedMessageService(action=DecryptedMessageActionNoop())
         message = await self.encrypt_secret_message(peer, message)
         await self.client(SendEncryptedServiceRequest(InputEncryptedChat(peer.id, peer.access_hash), message))
@@ -277,6 +277,7 @@ class SecretChatMethods:
                 decrypted_message.action.start_seq_no //= 2
                 decrypted_message.action.end_seq_no //= 2
                 self._log.warning(f"Resending messages for {peer.id}")
+                self._log.debug(f"outgoing peers {peer.outgoing}")
                 for seq, message in peer.outgoing:
                     if decrypted_message.action.start_seq_no <= seq <= decrypted_message.action.end_seq_no:
                         await self.send_secret_message(peer.id, message.message)

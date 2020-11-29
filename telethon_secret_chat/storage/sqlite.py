@@ -98,8 +98,6 @@ class SecretSQLiteSession(SecretMemorySession):
             chat.id, chat.access_hash, chat.auth_key, 1 if chat.admin else 0, chat.user_id, chat.in_seq_no_x,
             chat.out_seq_no_x, chat.in_seq_no, chat.out_seq_no, chat.layer, chat.ttl, chat.ttr, chat.updated,
             chat.created, chat.mtproto, temp)
-        print("saving new chat", row)
-        print(temp)
         try:
             c.execute(
                 f'insert or replace into {TABLE_NAME} values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', row)
