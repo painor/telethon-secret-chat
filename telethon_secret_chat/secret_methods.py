@@ -313,7 +313,7 @@ class SecretChatMethods:
                 decrypted_message.action.end_seq_no //= 2
                 self._log.warning(f"Resending messages for {peer.id}")
                 self._log.debug(f"outgoing peers {peer.outgoing}")
-                for seq, message in peer.outgoing:
+                for seq, message in peer.outgoing.items():
                     if decrypted_message.action.start_seq_no <= seq <= decrypted_message.action.end_seq_no:
                         await self.send_secret_message(peer.id, message.message)
                 return
