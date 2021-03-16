@@ -2,6 +2,8 @@ import os
 import random
 import struct
 from hashlib import sha1, sha256, md5
+
+import json
 from time import time
 
 import typing
@@ -52,7 +54,7 @@ class SecretChat:
     def __init__(self, id: int, access_hash: int, auth_key: bytes, admin: bool, user_id: int,
                  input_chat: [InputEncryptedChat, None], created=time(), updated=time(), in_seq_no_x=None,
                  out_seq_no_x=None, in_seq_no=0, out_seq_no=0, layer=DEFAULT_LAYER, ttl=0, ttr=100,
-                 mtproto=1):
+                 mtproto=1, session=None, is_temp=False):
         self.id = id
         self.access_hash = access_hash
         self.auth_key = auth_key
@@ -81,6 +83,38 @@ class SecretChat:
         # We probably don't need to store these
         self.rekeying = [0]
         self.mtproto = mtproto
+        if not session:
+            raise ValueError("Session needs to be set")
+        self.is_temp = is_temp
+        self.session = session
+
+        self.save()
+
+    def save(self):
+        self.session.save_chat(self, self.is_temp)
+
+    def __setattr__(self, key, value):
+        super.__setattr__(self, key, value)
+        if hasattr(self, "session"):
+            self.save()
+
+    def __repr__(self):
+        return json.dumps({
+            "id": self.id,
+            "access_hash": self.access_hash,
+            "admin": self.admin,
+            "user_id": self.user_id,
+            "input_chat": self.input_chat.to_dict(),
+            "in_seq_no": self.in_seq_no,
+            "out_seq_no": self.out_seq_no,
+            "layer": self.layer,
+            "ttr": self.ttr,
+            "ttl": self.ttl,
+            "mtproto": self.mtproto,
+        })
+
+    def __str__(self):
+        return repr(self)
 
 
 class SecretChatMethods:
@@ -132,8 +166,9 @@ class SecretChatMethods:
         g_a = pow(dh_config.g, a, dh_config.p)
         self.check_g_a(g_a, dh_config.p)
         res = await self.client(RequestEncryptionRequest(user_id=peer, g_a=g_a.to_bytes(256, 'big', signed=False)))
-        temp_chat = SecretChat(res.id, 0, a.to_bytes(256, 'big', signed=False), False, 0, None)
-        self.session.save_chat(temp_chat, True)
+        temp_chat = SecretChat(res.id, 0, a.to_bytes(256, 'big', signed=False), False, 0, None, is_temp=True,
+                               session=self.session)
+        temp_chat.save()
         return res.id
 
     def generate_secret_in_seq_no(self, chat_id):
@@ -601,8 +636,9 @@ class SecretChatMethods:
         key_fingerprint = struct.unpack('<q', sha1(auth_key).digest()[-8:])[0]
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
         secret_chat = SecretChat(chat.id, chat.access_hash, auth_key, admin=False, user_id=chat.admin_id,
-                                 input_chat=input_peer)
-        self.session.save_chat(secret_chat, False)
+                                 input_chat=input_peer, session=self.session)
+
+        secret_chat.save()
         g_b = pow(dh_config.g, b, dh_config.p)
         self.check_g_a(g_b, dh_config.p)
         result = await self.client(
@@ -624,6 +660,6 @@ class SecretChatMethods:
         if key_fingerprint != chat.key_fingerprint:
             raise ValueError("Wrong fingerprint")
         input_peer = InputEncryptedChat(chat_id=chat.id, access_hash=chat.access_hash)
-        self.session.save_chat(SecretChat(chat.id, chat.access_hash, auth_key, True, chat.participant_id,
-                                          input_peer), False)
+        SecretChat(chat.id, chat.access_hash, auth_key, True, chat.participant_id,
+                   input_peer, session=self.session).save()
         await self.notify_layer(chat)
