@@ -1978,560 +1978,560 @@ class InputStickerSetShortName(TLObject):
         return cls(short_name=_short_name)
 
 
-class MessageEntityBlockquote(TLObject):
-    CONSTRUCTOR_ID = 0x20df5d0
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityBlockquote',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xd0\xf5\r\x02',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityBold(TLObject):
-    CONSTRUCTOR_ID = 0xbd610bc9
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityBold',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xc9\x0ba\xbd',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityBotCommand(TLObject):
-    CONSTRUCTOR_ID = 0x6cef8ac7
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityBotCommand',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xc7\x8a\xefl',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityCashtag(TLObject):
-    CONSTRUCTOR_ID = 0x4c4e743f
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityCashtag',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'?tNL',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityCode(TLObject):
-    CONSTRUCTOR_ID = 0x28a20571
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityCode',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'q\x05\xa2(',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityEmail(TLObject):
-    CONSTRUCTOR_ID = 0x64e475c2
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityEmail',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xc2u\xe4d',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityHashtag(TLObject):
-    CONSTRUCTOR_ID = 0x6f635b0d
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityHashtag',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\r[co',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityItalic(TLObject):
-    CONSTRUCTOR_ID = 0x826f8b60
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityItalic',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'`\x8bo\x82',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityMention(TLObject):
-    CONSTRUCTOR_ID = 0xfa04579d
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityMention',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\x9dW\x04\xfa',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityMentionName(TLObject):
-    CONSTRUCTOR_ID = 0x352dca58
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int, user_id: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-        self.user_id = user_id
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityMentionName',
-            'offset': self.offset,
-            'length': self.length,
-            'user_id': self.user_id
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'X\xca-5',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-            struct.pack('<i', self.user_id),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        _user_id = reader.read_int()
-        return cls(offset=_offset, length=_length, user_id=_user_id)
-
-
-class MessageEntityPhone(TLObject):
-    CONSTRUCTOR_ID = 0x9b69e34b
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityPhone',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'K\xe3i\x9b',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityPre(TLObject):
-    CONSTRUCTOR_ID = 0x73924be0
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int, language: str):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-        self.language = language
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityPre',
-            'offset': self.offset,
-            'length': self.length,
-            'language': self.language
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xe0K\x92s',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-            self.serialize_bytes(self.language),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        _language = reader.tgread_string()
-        return cls(offset=_offset, length=_length, language=_language)
-
-
-class MessageEntityStrike(TLObject):
-    CONSTRUCTOR_ID = 0xbf0693d4
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityStrike',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\xd4\x93\x06\xbf',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityTextUrl(TLObject):
-    CONSTRUCTOR_ID = 0x76a6d327
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int, url: str):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-        self.url = url
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityTextUrl',
-            'offset': self.offset,
-            'length': self.length,
-            'url': self.url
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b"'\xd3\xa6v",
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-            self.serialize_bytes(self.url),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        _url = reader.tgread_string()
-        return cls(offset=_offset, length=_length, url=_url)
-
-
-class MessageEntityUnderline(TLObject):
-    CONSTRUCTOR_ID = 0x9c4e7e8b
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityUnderline',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\x8b~N\x9c',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityUnknown(TLObject):
-    CONSTRUCTOR_ID = 0xbb92ba95
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityUnknown',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'\x95\xba\x92\xbb',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
-
-
-class MessageEntityUrl(TLObject):
-    CONSTRUCTOR_ID = 0x6ed02538
-    SUBCLASS_OF_ID = 0x8eaa4c27
-
-    def __init__(self, offset: int, length: int):
-        """
-        Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
-        """
-        self.offset = offset
-        self.length = length
-
-    def to_dict(self):
-        return {
-            '_': 'MessageEntityUrl',
-            'offset': self.offset,
-            'length': self.length
-        }
-
-    def __bytes__(self):
-        return b''.join((
-            b'8%\xd0n',
-            struct.pack('<i', self.offset),
-            struct.pack('<i', self.length),
-        ))
-
-    @classmethod
-    def from_reader(cls, reader):
-        _offset = reader.read_int()
-        _length = reader.read_int()
-        return cls(offset=_offset, length=_length)
+# class MessageEntityBlockquote(TLObject):
+#     CONSTRUCTOR_ID = 0x20df5d0
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityBlockquote',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xd0\xf5\r\x02',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityBold(TLObject):
+#     CONSTRUCTOR_ID = 0xbd610bc9
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityBold',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xc9\x0ba\xbd',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityBotCommand(TLObject):
+#     CONSTRUCTOR_ID = 0x6cef8ac7
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityBotCommand',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xc7\x8a\xefl',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityCashtag(TLObject):
+#     CONSTRUCTOR_ID = 0x4c4e743f
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityCashtag',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'?tNL',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityCode(TLObject):
+#     CONSTRUCTOR_ID = 0x28a20571
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityCode',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'q\x05\xa2(',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityEmail(TLObject):
+#     CONSTRUCTOR_ID = 0x64e475c2
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityEmail',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xc2u\xe4d',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityHashtag(TLObject):
+#     CONSTRUCTOR_ID = 0x6f635b0d
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityHashtag',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\r[co',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityItalic(TLObject):
+#     CONSTRUCTOR_ID = 0x826f8b60
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityItalic',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'`\x8bo\x82',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityMention(TLObject):
+#     CONSTRUCTOR_ID = 0xfa04579d
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityMention',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\x9dW\x04\xfa',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityMentionName(TLObject):
+#     CONSTRUCTOR_ID = 0x352dca58
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int, user_id: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+#         self.user_id = user_id
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityMentionName',
+#             'offset': self.offset,
+#             'length': self.length,
+#             'user_id': self.user_id
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'X\xca-5',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#             struct.pack('<i', self.user_id),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         _user_id = reader.read_int()
+#         return cls(offset=_offset, length=_length, user_id=_user_id)
+
+
+# class MessageEntityPhone(TLObject):
+#     CONSTRUCTOR_ID = 0x9b69e34b
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityPhone',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'K\xe3i\x9b',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityPre(TLObject):
+#     CONSTRUCTOR_ID = 0x73924be0
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int, language: str):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+#         self.language = language
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityPre',
+#             'offset': self.offset,
+#             'length': self.length,
+#             'language': self.language
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xe0K\x92s',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#             self.serialize_bytes(self.language),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         _language = reader.tgread_string()
+#         return cls(offset=_offset, length=_length, language=_language)
+
+
+# class MessageEntityStrike(TLObject):
+#     CONSTRUCTOR_ID = 0xbf0693d4
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityStrike',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\xd4\x93\x06\xbf',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityTextUrl(TLObject):
+#     CONSTRUCTOR_ID = 0x76a6d327
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int, url: str):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+#         self.url = url
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityTextUrl',
+#             'offset': self.offset,
+#             'length': self.length,
+#             'url': self.url
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b"'\xd3\xa6v",
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#             self.serialize_bytes(self.url),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         _url = reader.tgread_string()
+#         return cls(offset=_offset, length=_length, url=_url)
+
+
+# class MessageEntityUnderline(TLObject):
+#     CONSTRUCTOR_ID = 0x9c4e7e8b
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityUnderline',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\x8b~N\x9c',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityUnknown(TLObject):
+#     CONSTRUCTOR_ID = 0xbb92ba95
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityUnknown',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'\x95\xba\x92\xbb',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
+
+
+# class MessageEntityUrl(TLObject):
+#     CONSTRUCTOR_ID = 0x6ed02538
+#     SUBCLASS_OF_ID = 0x8eaa4c27
+
+#     def __init__(self, offset: int, length: int):
+#         """
+#         Constructor for secret.MessageEntity: Instance of either MessageEntityUnknown, MessageEntityMention, MessageEntityHashtag, MessageEntityBotCommand, MessageEntityUrl, MessageEntityEmail, MessageEntityBold, MessageEntityItalic, MessageEntityCode, MessageEntityPre, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityPhone, MessageEntityCashtag, MessageEntityUnderline, MessageEntityStrike, MessageEntityBlockquote.
+#         """
+#         self.offset = offset
+#         self.length = length
+
+#     def to_dict(self):
+#         return {
+#             '_': 'MessageEntityUrl',
+#             'offset': self.offset,
+#             'length': self.length
+#         }
+
+#     def __bytes__(self):
+#         return b''.join((
+#             b'8%\xd0n',
+#             struct.pack('<i', self.offset),
+#             struct.pack('<i', self.length),
+#         ))
+
+#     @classmethod
+#     def from_reader(cls, reader):
+#         _offset = reader.read_int()
+#         _length = reader.read_int()
+#         return cls(offset=_offset, length=_length)
 
 
 class PhotoCachedSize(TLObject):
