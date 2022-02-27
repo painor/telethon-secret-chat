@@ -44,8 +44,8 @@ def _old_calc_key(auth_key, msg_key, client):
     sha1c = sha1(auth_key[x + 64:x + 96] + msg_key).digest()
     sha1d = sha1(msg_key + auth_key[x + 96:x + 128]).digest()
 
-    aes_key = sha1a[0:8] + sha1b[8:20] + sha1c[4:16]
-    aes_iv = sha1a[8:20] + sha1b[0:8] + sha1c[16:20] + sha1d[0:8]
+    aes_key = sha1a[:8] + sha1b[8:20] + sha1c[4:16]
+    aes_iv = sha1a[8:20] + sha1b[:8] + sha1c[16:20] + sha1d[:8]
 
     return aes_key, aes_iv
 
@@ -394,8 +394,8 @@ class SecretChatMethods:
         peer.outgoing[peer.out_seq_no] = message
         message = bytes(message)
         message = struct.pack('<I', len(message)) + message
+        padding = (16 - len(message) % 16) % 16
         if peer.mtproto == 2:
-            padding = (16 - len(message) % 16) % 16
             if padding < 12:
                 padding += 16
             message += os.urandom(padding)
@@ -408,7 +408,6 @@ class SecretChatMethods:
             message_key = sha1(message).digest()[-16:]
             aes_key, aes_iv = _old_calc_key(peer.auth_key, message_key,
                                             True)
-            padding = (16 - len(message) % 16) % 16
             message += os.urandom(padding)
         key_fingerprint = struct.unpack('<q', sha1(peer.auth_key).digest()[-8:])[0]
         message = struct.pack('<q', key_fingerprint) + message_key + AES.encrypt_ige(bytes.fromhex(message.hex()),
