@@ -257,7 +257,7 @@ class SecretChatMethods:
         del self._temp_rekeyed_secret_chats[action.exchange_id]
         peer.rekeying = [0]
         peer.auth_key = auth_key
-        peer.ttl = 100
+        peer.ttr = 100
         peer.updated = time()
 
     async def complete_rekey(self, peer, action: DecryptedMessageActionCommitKey):
@@ -560,6 +560,10 @@ class SecretChatMethods:
         peer = self.get_secret_chat(peer)
         if peer.layer == 8:
             return
+        # override a layer downgrade below 101 so that markdown strikethrough doesn't error out
+        if peer.layer < DEFAULT_LAYER:
+            self._log.debug(f'notify_layer: overriding layer {peer.layer} to {DEFAULT_LAYER}')
+            peer.layer = DEFAULT_LAYER
         message = DecryptedMessageService8(action=DecryptedMessageActionNotifyLayer(
             layer=min(DEFAULT_LAYER, peer.layer)), random_bytes=os.urandom(15 + 4 * random.randint(0, 2)))
         data = await self.encrypt_secret_message(peer.id, message)
