@@ -257,7 +257,7 @@ class SecretChatMethods:
         del self._temp_rekeyed_secret_chats[action.exchange_id]
         peer.rekeying = [0]
         peer.auth_key = auth_key
-        peer.ttl = 100
+        peer.ttr = 100
         peer.updated = time()
 
     async def complete_rekey(self, peer, action: DecryptedMessageActionCommitKey):
