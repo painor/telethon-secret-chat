@@ -87,7 +87,7 @@ class SecretChatManager(SecretChatMethods):
                 (event_type, callback) = events
                 if event_type == SECRET_TYPES.decrypt:
                     if not decrypted_event:
-                        decrypted_event = await self.handle_encrypted_update(event
+                        decrypted_event = await self.handle_encrypted_update(event)
                         decrypted_event_type = type(decrypted_event).__name__
                         if("DecryptedMessage" not in decrypted_event_type  or 
                            "DecryptedMessageService" in decrypted_event_type):
